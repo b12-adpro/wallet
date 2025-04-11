@@ -16,11 +16,15 @@ public class WalletRepositoryTest {
     @Test
     public void testSaveAndFindById() {
         Wallet wallet = new Wallet();
+        wallet.setUserId(1L);
         wallet.setBalance(new BigDecimal("0"));
         wallet = walletRepository.save(wallet);
         
+        assertThat(wallet.getId()).isNotNull();
         Wallet retrieved = walletRepository.findById(wallet.getId()).orElse(null);
         assertThat(retrieved).isNotNull();
         assertThat(retrieved.getBalance()).isEqualTo(BigDecimal.ZERO);
+        
+        assertThat(walletRepository.findByUserId(1L).orElse(null)).isNotNull();
     }
 }
