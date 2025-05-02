@@ -86,4 +86,17 @@ public class WalletServiceImpl implements WalletService {
         if (observers.isEmpty()) { observers.add(new NotificationService()); }
         observers.forEach(o -> o.update(wallet));
     }
+
+    @Override
+    public void receiveDonation(Long userId, String amountStr) {
+        BigDecimal donationAmount = new BigDecimal(amountStr);
+        Wallet wallet = getWallet(userId);
+        wallet.setBalance(wallet.getBalance().add(donationAmount));
+        walletRepository.save(wallet);
+
+        if (observers.isEmpty()) {
+            observers.add(new NotificationService());
+        }
+        observers.forEach(o -> o.update(wallet));
+    }
 }
