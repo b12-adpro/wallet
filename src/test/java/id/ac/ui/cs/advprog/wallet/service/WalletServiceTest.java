@@ -48,4 +48,12 @@ public class WalletServiceTest {
         Wallet wallet = walletService.getWallet(1L);
         assertEquals(new BigDecimal("700"), wallet.getBalance());
     }
+
+    @Test
+    public void testReceiveDonation() {
+        walletService.topUpWallet(1L, "1000");
+        walletService.receiveDonation(1L, "200");
+        Wallet wallet = walletService.getWallet(1L);
+        assertEquals(new BigDecimal("1200"), wallet.getBalance());
+    }
 }
