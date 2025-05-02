@@ -7,5 +7,4 @@ public interface WalletService {
     void topUpWallet(Long userId, String amountStr);
     void withdrawCampaign(Long userId, String amountStr);
     void donateWallet(Long userId, String amountStr);
-    void receiveDonation(Long userId, String amountStr);
 }
