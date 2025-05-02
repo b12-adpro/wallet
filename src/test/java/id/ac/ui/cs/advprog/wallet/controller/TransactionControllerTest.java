@@ -28,9 +28,7 @@ public class TransactionControllerTest {
     private TransactionService transactionService;
 
     @InjectMocks
-    private TransactionController transactionController;
-
-    private final ObjectMapper mapper = new ObjectMapper();
+    private TransactionController transactionController;;
 
     @Test
     public void testGetAllTransactions() {
