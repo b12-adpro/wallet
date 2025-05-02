@@ -32,4 +32,12 @@ public class WalletServiceTest {
         Wallet wallet = walletService.getWallet(1L);
         assertEquals(new BigDecimal("1000"), wallet.getBalance());
     }
+
+    @Test
+    public void testWithdrawWallet() {
+        walletService.topUpWallet(1L, "1000");
+        walletService.withdrawWallet(1L, "500");
+        Wallet wallet = walletService.getWallet(1L);
+        assertEquals(new BigDecimal("500"), wallet.getBalance());
+    }
 }
