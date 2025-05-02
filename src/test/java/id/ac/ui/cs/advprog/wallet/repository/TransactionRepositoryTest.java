@@ -27,11 +27,11 @@ public class TransactionRepositoryTest {
         Long userId = 1L;
 
         walletService.topUpWallet(userId, "1000");
-        walletService.withdrawWallet(userId, "500");
+        walletService.withdrawCampaign(userId, "500");
         walletService.donateWallet(userId, "200");
 
         Wallet wallet = walletService.getWallet(userId);
-        assertEquals(new BigDecimal("300"), wallet.getBalance(), "Saldo akhir harus 300");
+        assertEquals(new BigDecimal("1300"), wallet.getBalance(), "Saldo akhir harus 1300");
 
         List<TransactionEntity> transactions = transactionRepository.findByWalletUserId(userId);
         assertEquals(3, transactions.size(), "Harus tercatat 3 transaksi");

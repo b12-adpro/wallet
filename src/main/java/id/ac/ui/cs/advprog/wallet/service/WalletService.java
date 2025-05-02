@@ -5,7 +5,7 @@ import id.ac.ui.cs.advprog.wallet.model.Wallet;
 public interface WalletService {
     Wallet getWallet(Long userId);
     void topUpWallet(Long userId, String amountStr);
-    void withdrawWallet(Long userId, String amountStr);
+    void withdrawCampaign(Long userId, String amountStr);
     void donateWallet(Long userId, String amountStr);
     void receiveDonation(Long userId, String amountStr);
 }

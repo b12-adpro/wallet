@@ -54,10 +54,10 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public void withdrawWallet(Long userId, String amountStr) {
+    public void withdrawCampaign(Long userId, String amountStr) {
         int withdrawAmount = Integer.parseInt(amountStr);
         Wallet wallet = getWallet(userId);
-        wallet.setBalance(wallet.getBalance().subtract(new BigDecimal(withdrawAmount)));
+        wallet.setBalance(wallet.getBalance().add(new BigDecimal(withdrawAmount)));
         walletRepository.save(wallet);
 
         // Buat dan simpan transaksi WITHDRAWAL
