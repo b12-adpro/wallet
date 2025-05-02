@@ -42,4 +42,18 @@ public class WalletServiceImpl implements WalletService {
         }
         observers.forEach(o -> o.update(wallet));
     }
+
+    @Override
+    public void withdrawWallet(Long userId, String amountStr) {
+        int withdrawAmount = Integer.parseInt(amountStr);
+        Wallet wallet = getWallet(userId);
+        // Asumsi saldo cukup dan dicek dari pengecekan sebelumnya
+        wallet.setBalance(wallet.getBalance().subtract(new BigDecimal(withdrawAmount)));
+        walletRepository.save(wallet);
+
+        if (observers.isEmpty()) {
+            observers.add(new NotificationService());
+        }
+        observers.forEach(o -> o.update(wallet));
+    }
 }
