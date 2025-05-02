@@ -3,7 +3,8 @@ package id.ac.ui.cs.advprog.wallet.model;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.*; 
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -14,11 +15,7 @@ import java.util.UUID;
 public class Wallet {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-       name = "UUID",
-       strategy = "org.hibernate.id.UUIDGenerator"
-    )
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM) 
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id; 
 
