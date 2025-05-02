@@ -12,9 +12,6 @@ import java.math.BigDecimal;
 @DataJpaTest
 @Import(WalletServiceImpl.class)
 public class WalletServiceTest {
-
-    @Autowired
-    private WalletRepository walletRepository;
     
     @Autowired
     private WalletService walletService;
@@ -31,5 +28,21 @@ public class WalletServiceTest {
         walletService.topUpWallet(1L, "1000");
         Wallet wallet = walletService.getWallet(1L);
         assertEquals(new BigDecimal("1000"), wallet.getBalance());
+    }
+
+    @Test
+    public void testWithdrawCampaign() {
+        walletService.topUpWallet(1L, "1000");
+        walletService.withdrawCampaign(1L, "500");
+        Wallet wallet = walletService.getWallet(1L);
+        assertEquals(new BigDecimal("1500"), wallet.getBalance());
+    }
+
+    @Test
+    public void testDonateWallet() {
+        walletService.topUpWallet(1L, "1000");
+        walletService.donateWallet(1L, "300");
+        Wallet wallet = walletService.getWallet(1L);
+        assertEquals(new BigDecimal("700"), wallet.getBalance());
     }
 }
