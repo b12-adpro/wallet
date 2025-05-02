@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<TransactionEntity, UUID> {
     List<TransactionEntity> findByWalletUserId(Long userId);
+    List<TransactionEntity> findByType(String type);
 }
