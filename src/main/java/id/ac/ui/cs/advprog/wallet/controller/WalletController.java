@@ -34,16 +34,20 @@ public class WalletController {
     }
     
     @PostMapping("/donate")
-    public ResponseEntity<GeneralResponse> donate(@RequestParam("userId") Long userId) {
-        // Stub: Belum diimplementasikan
-        GeneralResponse response = GeneralResponse.from(null, "NOT_IMPLEMENTED", "Not implemented");
-        return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<GeneralResponse> donate(@RequestParam("userId") Long userId,
+                                                  @RequestParam("amount") String amount) {
+        walletService.donateWallet(userId, amount);
+        Wallet wallet = walletService.getWallet(userId);
+        GeneralResponse response = GeneralResponse.from(wallet, "OK", "Donation successful");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @PostMapping("/withdrawals")
-    public ResponseEntity<GeneralResponse> withdrawals(@RequestParam("userId") Long userId) {
-        // Stub: Belum diimplementasikan
-        GeneralResponse response = GeneralResponse.from(null, "NOT_IMPLEMENTED", "Not implemented");
-        return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<GeneralResponse> withdrawals(@RequestParam("userId") Long userId,
+                                                       @RequestParam("amount") String amount) {
+        walletService.withdrawCampaign(userId, amount);
+        Wallet wallet = walletService.getWallet(userId);
+        GeneralResponse response = GeneralResponse.from(wallet, "OK", "Campaign withdrawal successful");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
