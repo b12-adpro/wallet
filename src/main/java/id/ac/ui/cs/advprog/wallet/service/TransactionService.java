@@ -8,6 +8,7 @@ public interface TransactionService {
     List<TransactionEntity> getAllTransactions();
     List<TransactionEntity> getTransactionsByType(String type);
     TransactionEntity getTransactionById(UUID id);
+    List<TransactionEntity> getTransactionsByUserId(UUID userId);
     void deleteTopUpTransaction(UUID id);
     void recordTransaction(TransactionEntity transactionEntity);
 }
