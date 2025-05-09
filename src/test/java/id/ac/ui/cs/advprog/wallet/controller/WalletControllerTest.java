@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.math.BigDecimal;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -26,7 +28,7 @@ public class WalletControllerTest {
     
     @Test
     public void testGetWallet() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         Wallet wallet = new Wallet();
         wallet.setUserId(userId);
         when(walletService.getWallet(userId)).thenReturn(wallet);
@@ -42,7 +44,7 @@ public class WalletControllerTest {
     
     @Test
     public void testTopUpWallet() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         Wallet wallet = new Wallet();
         wallet.setUserId(userId);
         wallet.setBalance(new BigDecimal("1000"));
@@ -59,14 +61,13 @@ public class WalletControllerTest {
     
     @Test
     public void testDonate() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         // Stub method donateWallet agar tidak melempar exception
         doNothing().when(walletService).donateWallet(userId, "500");
         
-        // Misalnya, setelah donasi, saldo wallet berkurang
         Wallet updatedWallet = new Wallet();
         updatedWallet.setUserId(userId);
-        updatedWallet.setBalance(new BigDecimal("500"));  // Asumsikan saldo awal 1000, donasi 500 menghasilkan saldo 500
+        updatedWallet.setBalance(new BigDecimal("500")); 
         when(walletService.getWallet(userId)).thenReturn(updatedWallet);
         
         ResponseEntity<GeneralResponse> response = walletController.donate(userId, "500");
@@ -80,14 +81,13 @@ public class WalletControllerTest {
     
     @Test
     public void testWithdrawals() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         // Stub method withdrawCampaign agar tidak melempar exception
         doNothing().when(walletService).withdrawCampaign(userId, "300");
         
-        // Misalnya, setelah penarikan campaign, saldo wallet bertambah
         Wallet updatedWallet = new Wallet();
         updatedWallet.setUserId(userId);
-        updatedWallet.setBalance(new BigDecimal("1300"));  // Asumsikan saldo awal 1000, penarikan 300 menghasilkan saldo 1300
+        updatedWallet.setBalance(new BigDecimal("1300")); 
         when(walletService.getWallet(userId)).thenReturn(updatedWallet);
         
         ResponseEntity<GeneralResponse> response = walletController.withdrawals(userId, "300");

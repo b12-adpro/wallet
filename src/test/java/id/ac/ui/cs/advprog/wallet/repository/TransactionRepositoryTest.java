@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -24,7 +26,7 @@ public class TransactionRepositoryTest {
 
     @Test
     public void testAllTransactionTypes() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
 
         walletService.topUpWallet(userId, "1000");
         walletService.withdrawCampaign(userId, "500");

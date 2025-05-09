@@ -1,6 +1,5 @@
 package id.ac.ui.cs.advprog.wallet.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import id.ac.ui.cs.advprog.wallet.dto.GeneralResponse;
 import id.ac.ui.cs.advprog.wallet.model.transaction.TransactionEntity;
 import id.ac.ui.cs.advprog.wallet.service.TransactionService;

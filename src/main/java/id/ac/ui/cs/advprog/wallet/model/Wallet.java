@@ -19,8 +19,8 @@ public class Wallet {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id; 
 
-    @Column(name = "user_id", unique = true)
-    private Long userId;
+    @Column(name = "user_id", unique = true, columnDefinition = "UUID")
+    private UUID userId;
 
     @Column(name = "balance")
     private BigDecimal balance;
