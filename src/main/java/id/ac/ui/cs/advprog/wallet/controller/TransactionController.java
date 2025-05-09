@@ -43,4 +43,10 @@ public class TransactionController {
         transactionService.deleteTopUpTransaction(id);
         return new ResponseEntity<>(GeneralResponse.from(null, "OK", "Transaction deleted"), HttpStatus.OK);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<GeneralResponse> getTransactionsByUser(@PathVariable("userId") UUID userId) {
+        List<TransactionEntity> transactions = transactionService.getTransactionsByUserId(userId);
+        return new ResponseEntity<>(GeneralResponse.from(transactions, "OK", "Success"), HttpStatus.OK);
+    }
 }

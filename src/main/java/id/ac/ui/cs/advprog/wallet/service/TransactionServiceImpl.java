@@ -32,6 +32,10 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
     }
+
+    public List<TransactionEntity> getTransactionsByUserId(UUID userId) {
+        return transactionRepository.findByWalletUserId(userId);
+    }
     
     @Override
     public void deleteTopUpTransaction(UUID id) {
