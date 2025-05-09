@@ -81,4 +81,22 @@ public class TransactionControllerTest {
         assertEquals("OK", body.getStatus());
         assertEquals("Transaction deleted", body.getMessage());
     }
+    
+    @Test
+    public void testGetTransactionsByUser() {
+        UUID userId = UUID.randomUUID();
+        TransactionEntity trx = new TransactionEntity("TOP_UP", new BigDecimal("100"), LocalDateTime.now(), null);
+        // Simulasikan pemanggilan service berdasarkan userId
+        when(transactionService.getTransactionsByUserId(userId)).thenReturn(Arrays.asList(trx));
+    
+        // Method getTransactionsByUser belum ada di TransactionController, sehingga test akan gagal
+        ResponseEntity<GeneralResponse> response = transactionController.getTransactionsByUser(userId);
+    
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        GeneralResponse body = response.getBody();
+        assertEquals("OK", body.getStatus());
+        List<TransactionEntity> transactions = (List<TransactionEntity>) body.getData();
+        assertEquals(1, transactions.size());
+        assertEquals("TOP_UP", transactions.get(0).getType());
+    }
 }
