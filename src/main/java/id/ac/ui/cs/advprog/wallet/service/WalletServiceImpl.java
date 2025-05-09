@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -28,7 +29,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Wallet getWallet(Long userId) {
+    public Wallet getWallet(UUID userId) {
         return walletRepository.findByUserId(userId).orElseGet(() -> {
             Wallet wallet = new Wallet();
             wallet.setUserId(userId);
@@ -37,7 +38,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public void topUpWallet(Long userId, String amountStr) {
+    public void topUpWallet(UUID userId, String amountStr) {
         int topUpAmount = Integer.parseInt(amountStr);
         Wallet wallet = getWallet(userId);
         wallet.setBalance(wallet.getBalance().add(new BigDecimal(topUpAmount)));
@@ -54,7 +55,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public void withdrawCampaign(Long userId, String amountStr) {
+    public void withdrawCampaign(UUID userId, String amountStr) {
         int withdrawAmount = Integer.parseInt(amountStr);
         Wallet wallet = getWallet(userId);
         wallet.setBalance(wallet.getBalance().add(new BigDecimal(withdrawAmount)));
@@ -71,7 +72,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public void donateWallet(Long userId, String amountStr) {
+    public void donateWallet(UUID userId, String amountStr) {
         int donationAmount = Integer.parseInt(amountStr);
         Wallet wallet = getWallet(userId);
         wallet.setBalance(wallet.getBalance().subtract(new BigDecimal(donationAmount)));

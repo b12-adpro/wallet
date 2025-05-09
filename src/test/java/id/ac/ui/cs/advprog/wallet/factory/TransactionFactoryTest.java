@@ -1,7 +1,6 @@
 package id.ac.ui.cs.advprog.wallet.factory;
 
 import id.ac.ui.cs.advprog.wallet.model.transaction.Transaction;
-import id.ac.ui.cs.advprog.wallet.factory.TransactionFactory;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.math.BigDecimal;
