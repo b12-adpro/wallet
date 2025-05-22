@@ -2,12 +2,17 @@ package id.ac.ui.cs.advprog.wallet.repository;
 
 import id.ac.ui.cs.advprog.wallet.model.Wallet;
 import id.ac.ui.cs.advprog.wallet.model.transaction.TransactionEntity;
+import id.ac.ui.cs.advprog.wallet.observer.NotificationService; 
 import id.ac.ui.cs.advprog.wallet.service.WalletService;
 import id.ac.ui.cs.advprog.wallet.service.WalletServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.extension.ExtendWith; 
+import org.mockito.Mock; 
+import org.mockito.junit.jupiter.MockitoExtension; 
+import org.springframework.beans.factory.annotation.Autowired; 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -15,28 +20,38 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@Import(WalletServiceImpl.class)
+@ExtendWith(MockitoExtension.class)
 public class TransactionRepositoryTest {
 
-    @Autowired
-    private WalletService walletService;
+    @Autowired 
+    private WalletRepository walletRepository;
 
-    @Autowired
+    @Autowired 
     private TransactionRepository transactionRepository;
 
+    @Mock 
+    private NotificationService notificationServiceMock;
+
+    private WalletService walletService; 
+
+    @BeforeEach
+    void setUp() {
+        walletService = new WalletServiceImpl(walletRepository, transactionRepository, notificationServiceMock);
+    }
+
     @Test
-    public void testAllTransactionTypes() {
+    void testAllTransactionTypes() {
         UUID userId = UUID.randomUUID();
 
-        walletService.topUpWallet(userId, "1000");
-        walletService.withdrawCampaign(userId, "500");
-        walletService.donateWallet(userId, "200");
+        walletService.topUpWallet(userId, "10000");   
+        walletService.withdrawCampaign(userId, "5000");  
+        walletService.donateWallet(userId, "2000");      
 
         Wallet wallet = walletService.getWallet(userId);
-        assertEquals(new BigDecimal("1300"), wallet.getBalance(), "Saldo akhir harus 1300");
+        assertEquals(0, new BigDecimal("13000").compareTo(wallet.getBalance()));
 
         List<TransactionEntity> transactions = transactionRepository.findByWalletUserId(userId);
-        assertEquals(3, transactions.size(), "Harus tercatat 3 transaksi");
+        assertEquals(3, transactions.size());
 
         boolean topUpFound = false;
         boolean withdrawalFound = false;
@@ -46,23 +61,22 @@ public class TransactionRepositoryTest {
             switch (tx.getType()) {
                 case "TOP_UP":
                     topUpFound = true;
-                    assertEquals(new BigDecimal("1000"), tx.getAmount(), "Jumlah top-up harus 1000");
+                    assertEquals(0, new BigDecimal("10000.00").compareTo(tx.getAmount()));
                     break;
                 case "WITHDRAWAL":
                     withdrawalFound = true;
-                    assertEquals(new BigDecimal("500"), tx.getAmount(), "Jumlah withdrawal harus 500");
+                    assertEquals(0, new BigDecimal("5000.00").compareTo(tx.getAmount()));
                     break;
                 case "DONATION":
                     donationFound = true;
-                    assertEquals(new BigDecimal("200"), tx.getAmount(), "Jumlah donation harus 200");
+                    assertEquals(0, new BigDecimal("2000.00").compareTo(tx.getAmount()));
                     break;
                 default:
                     fail("Tipe transaksi tidak dikenal: " + tx.getType());
             }
         }
-
-        assertTrue(topUpFound, "Transaksi TOP_UP tidak ditemukan");
-        assertTrue(withdrawalFound, "Transaksi WITHDRAWAL tidak ditemukan");
-        assertTrue(donationFound, "Transaksi DONATION tidak ditemukan");
+        assertTrue(topUpFound);
+        assertTrue(withdrawalFound);
+        assertTrue(donationFound);
     }
 }
