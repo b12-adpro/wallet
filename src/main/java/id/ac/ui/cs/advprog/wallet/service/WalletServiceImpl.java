@@ -65,31 +65,45 @@ public class WalletServiceImpl implements WalletService {
 
         Transaction topUp = TransactionFactory.createTransaction("TOP_UP", amountDecimal);
         TransactionEntity trxEntity = new TransactionEntity(
-                topUp.getType(), topUp.getAmount(), topUp.getTimestamp(), currentWallet);
+                topUp.getType(), topUp.getAmount(), topUp.getTimestamp(), currentWallet,
+                null, null); 
         transactionRepository.save(trxEntity);
 
         notifyObservers(currentWallet);
     }
 
     @Override
-    public void withdrawCampaign(UUID userId, String amountStr) {
-        int withdrawAmount = Integer.parseInt(amountStr);
+    public void withdrawCampaign(UUID userId, String amountStr, UUID campaignId) { 
+        BigDecimal withdrawAmountDecimal;
+        try {
+            withdrawAmountDecimal = new BigDecimal(amountStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid withdrawal amount format: " + amountStr + ". Must be a valid number.");
+        }
+
+        if (withdrawAmountDecimal.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Withdrawal amount must be positive.");
+        }
+        if (campaignId == null) { 
+            throw new IllegalArgumentException("CampaignId is required for withdrawal.");
+        }
+
         Wallet wallet = getWallet(userId);
-        wallet.setBalance(wallet.getBalance().add(new BigDecimal(withdrawAmount)));
+        wallet.setBalance(wallet.getBalance().add(withdrawAmountDecimal)); 
         walletRepository.save(wallet);
 
-        Transaction withdrawal = TransactionFactory.createTransaction("WITHDRAWAL", new BigDecimal(withdrawAmount));
+        Transaction withdrawal = TransactionFactory.createWithdrawalTransaction(withdrawAmountDecimal, campaignId);
         TransactionEntity trxEntity = new TransactionEntity(
-                withdrawal.getType(), withdrawal.getAmount(), withdrawal.getTimestamp(), wallet);
+                withdrawal.getType(), withdrawal.getAmount(), withdrawal.getTimestamp(), wallet,
+                campaignId, null); 
         transactionRepository.save(trxEntity);
 
-        if (observers.isEmpty()) { observers.add(new NotificationService()); }
-        observers.forEach(o -> o.update(wallet));
+        notifyObservers(wallet);
     }
 
     @Override
-    public void donateWallet(UUID userId, String amountStr) {
-        BigDecimal donationAmountDecimal; 
+    public void donateWallet(UUID userId, String amountStr, UUID campaignId, UUID donationId) { 
+        BigDecimal donationAmountDecimal;
         try {
             donationAmountDecimal = new BigDecimal(amountStr);
         } catch (NumberFormatException e) {
@@ -99,9 +113,11 @@ public class WalletServiceImpl implements WalletService {
         if (donationAmountDecimal.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Donation amount must be positive.");
         }
+        if (campaignId == null || donationId == null) { 
+            throw new IllegalArgumentException("CampaignId and DonationId are required for donation.");
+        }
 
         Wallet wallet = getWallet(userId);
-
         if (wallet.getBalance().compareTo(donationAmountDecimal) < 0) {
             throw new IllegalArgumentException("Insufficient balance for donation. Current balance: " + wallet.getBalance() + ", Donation amount: " + donationAmountDecimal);
         }
@@ -109,12 +125,13 @@ public class WalletServiceImpl implements WalletService {
         wallet.setBalance(wallet.getBalance().subtract(donationAmountDecimal));
         walletRepository.save(wallet);
 
-        Transaction donation = TransactionFactory.createTransaction("DONATION", donationAmountDecimal);
+        Transaction donation = TransactionFactory.createDonationTransaction(donationAmountDecimal, campaignId, donationId);
         TransactionEntity trxEntity = new TransactionEntity(
-                donation.getType(), donation.getAmount(), donation.getTimestamp(), wallet);
+                donation.getType(), donation.getAmount(), donation.getTimestamp(), wallet,
+                campaignId, donationId); 
         transactionRepository.save(trxEntity);
 
-        notifyObservers(wallet); 
+        notifyObservers(wallet);
     }
 
     private void notifyObservers(Wallet wallet) {

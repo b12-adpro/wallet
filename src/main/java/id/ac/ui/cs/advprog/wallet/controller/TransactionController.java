@@ -7,7 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -48,5 +51,22 @@ public class TransactionController {
     public ResponseEntity<GeneralResponse> getTransactionsByUser(@PathVariable("userId") UUID userId) {
         List<TransactionEntity> transactions = transactionService.getTransactionsByUserId(userId);
         return new ResponseEntity<>(GeneralResponse.from(transactions, "OK", "Success"), HttpStatus.OK);
+    }
+
+    @GetMapping("/donations/campaign/{campaignId}")
+    public ResponseEntity<GeneralResponse> getAllDonationsByCampaignId(@PathVariable("campaignId") UUID campaignId) {
+        List<TransactionEntity> transactions = transactionService.getAllDonationsByCampaignId(campaignId);
+        return new ResponseEntity<>(GeneralResponse.from(transactions, "OK", "Donation transactions for campaign retrieved successfully."), HttpStatus.OK);
+    }
+
+    @GetMapping("/campaign/{campaignId}/donations/total")
+    public ResponseEntity<GeneralResponse> getTotalDonationsForCampaign(@PathVariable("campaignId") UUID campaignId) {
+        BigDecimal totalDonations = transactionService.getTotalDonationsForCampaign(campaignId);
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("campaignId", campaignId);
+        responseData.put("totalDonationAmount", totalDonations);
+
+        return new ResponseEntity<>(GeneralResponse.from(responseData, "OK", "Total donations for campaign retrieved successfully."), HttpStatus.OK);
     }
 }
