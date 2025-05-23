@@ -37,17 +37,20 @@ public class WalletController {
     
     @PostMapping("/donate")
     public ResponseEntity<GeneralResponse> donate(@RequestParam("userId") UUID userId,
-                                                  @RequestParam("amount") String amount) {
-        walletService.donateWallet(userId, amount);
+                                                  @RequestParam("amount") String amount,
+                                                  @RequestParam("campaignId") UUID campaignId, 
+                                                  @RequestParam("donationId") UUID donationId) {
+        walletService.donateWallet(userId, amount, campaignId, donationId); 
         Wallet wallet = walletService.getWallet(userId);
         GeneralResponse response = GeneralResponse.from(wallet, "OK", "Donation successful");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    
-    @PostMapping("/withdrawals")
+
+    @PostMapping("/withdrawals") 
     public ResponseEntity<GeneralResponse> withdrawals(@RequestParam("userId") UUID userId,
-                                                       @RequestParam("amount") String amount) {
-        walletService.withdrawCampaign(userId, amount);
+                                                       @RequestParam("amount") String amount,
+                                                       @RequestParam("campaignId") UUID campaignId) { 
+        walletService.withdrawCampaign(userId, amount, campaignId); 
         Wallet wallet = walletService.getWallet(userId);
         GeneralResponse response = GeneralResponse.from(wallet, "OK", "Campaign withdrawal successful");
         return new ResponseEntity<>(response, HttpStatus.OK);
