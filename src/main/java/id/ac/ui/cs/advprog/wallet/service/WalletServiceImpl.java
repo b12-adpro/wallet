@@ -6,8 +6,10 @@ import id.ac.ui.cs.advprog.wallet.factory.TransactionFactory;
 import id.ac.ui.cs.advprog.wallet.model.transaction.Transaction; 
 import id.ac.ui.cs.advprog.wallet.repository.TransactionRepository;
 import id.ac.ui.cs.advprog.wallet.repository.WalletRepository;
+import id.ac.ui.cs.advprog.wallet.validator.TopUpValidator;
 import id.ac.ui.cs.advprog.wallet.observer.WalletObserver;
 import id.ac.ui.cs.advprog.wallet.observer.NotificationService;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -22,10 +24,15 @@ public class WalletServiceImpl implements WalletService {
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository; 
     private List<WalletObserver> observers = new ArrayList<>();
+    private final TopUpValidator topUpValidator;
 
-    public WalletServiceImpl(WalletRepository walletRepository, TransactionRepository transactionRepository) {
+    public WalletServiceImpl(WalletRepository walletRepository, TransactionRepository transactionRepository, NotificationService notificationService) {
         this.walletRepository = walletRepository;
         this.transactionRepository = transactionRepository;
+        this.topUpValidator = new TopUpValidator(transactionRepository);
+        if (notificationService != null) {
+            this.observers.add(notificationService);
+        }
     }
 
     @Override
@@ -39,19 +46,29 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public void topUpWallet(UUID userId, String amountStr) {
-        int topUpAmount = Integer.parseInt(amountStr);
-        Wallet wallet = getWallet(userId);
-        wallet.setBalance(wallet.getBalance().add(new BigDecimal(topUpAmount)));
-        walletRepository.save(wallet);
+        BigDecimal amountDecimal;
+        try {
+            amountDecimal = new BigDecimal(amountStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid amount format: " + amountStr + ". Must be a valid number.");
+        }
 
-        // Buat dan simpan transaksi TOP_UP
-        Transaction topUp = TransactionFactory.createTransaction("TOP_UP", new BigDecimal(topUpAmount));
+        Wallet currentWallet = getWallet(userId);
+
+        if (!topUpValidator.validate(userId, amountDecimal, currentWallet.getBalance())) {
+            String combinedErrorMessage = String.join("; ", topUpValidator.getErrorMessages());
+            throw new IllegalArgumentException(combinedErrorMessage);
+        }
+
+        currentWallet.setBalance(currentWallet.getBalance().add(amountDecimal));
+        walletRepository.save(currentWallet);
+
+        Transaction topUp = TransactionFactory.createTransaction("TOP_UP", amountDecimal);
         TransactionEntity trxEntity = new TransactionEntity(
-                topUp.getType(), topUp.getAmount(), topUp.getTimestamp(), wallet);
+                topUp.getType(), topUp.getAmount(), topUp.getTimestamp(), currentWallet);
         transactionRepository.save(trxEntity);
 
-        if (observers.isEmpty()) { observers.add(new NotificationService()); }
-        observers.forEach(o -> o.update(wallet));
+        notifyObservers(currentWallet);
     }
 
     @Override
@@ -61,7 +78,6 @@ public class WalletServiceImpl implements WalletService {
         wallet.setBalance(wallet.getBalance().add(new BigDecimal(withdrawAmount)));
         walletRepository.save(wallet);
 
-        // Buat dan simpan transaksi WITHDRAWAL
         Transaction withdrawal = TransactionFactory.createTransaction("WITHDRAWAL", new BigDecimal(withdrawAmount));
         TransactionEntity trxEntity = new TransactionEntity(
                 withdrawal.getType(), withdrawal.getAmount(), withdrawal.getTimestamp(), wallet);
@@ -73,18 +89,37 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public void donateWallet(UUID userId, String amountStr) {
-        int donationAmount = Integer.parseInt(amountStr);
+        BigDecimal donationAmountDecimal; 
+        try {
+            donationAmountDecimal = new BigDecimal(amountStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid donation amount format: " + amountStr + ". Must be a valid number.");
+        }
+
+        if (donationAmountDecimal.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Donation amount must be positive.");
+        }
+
         Wallet wallet = getWallet(userId);
-        wallet.setBalance(wallet.getBalance().subtract(new BigDecimal(donationAmount)));
+
+        if (wallet.getBalance().compareTo(donationAmountDecimal) < 0) {
+            throw new IllegalArgumentException("Insufficient balance for donation. Current balance: " + wallet.getBalance() + ", Donation amount: " + donationAmountDecimal);
+        }
+
+        wallet.setBalance(wallet.getBalance().subtract(donationAmountDecimal));
         walletRepository.save(wallet);
 
-        // Buat dan simpan transaksi DONATION
-        Transaction donation = TransactionFactory.createTransaction("DONATION", new BigDecimal(donationAmount));
+        Transaction donation = TransactionFactory.createTransaction("DONATION", donationAmountDecimal);
         TransactionEntity trxEntity = new TransactionEntity(
                 donation.getType(), donation.getAmount(), donation.getTimestamp(), wallet);
         transactionRepository.save(trxEntity);
 
-        if (observers.isEmpty()) { observers.add(new NotificationService()); }
-        observers.forEach(o -> o.update(wallet));
+        notifyObservers(wallet); 
+    }
+
+    private void notifyObservers(Wallet wallet) {
+        for (WalletObserver observer : observers) {
+            observer.update(wallet);
+        }
     }
 }

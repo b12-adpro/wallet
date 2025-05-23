@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -21,7 +22,7 @@ public class TransactionServiceTest {
     @Autowired
     private TransactionRepository transactionRepository;
     
-    // Helper: Membuat dan menyimpan TransactionEntity dummy (wallet diabaikan dengan null untuk penyederhanaan)
+    // wallet diabaikan dengan null untuk penyederhanaan
     private TransactionEntity createTransactionEntity(String type, BigDecimal amount) {
         TransactionEntity entity = new TransactionEntity(type, amount, LocalDateTime.now(), null);
         return transactionRepository.save(entity);
@@ -29,14 +30,11 @@ public class TransactionServiceTest {
     
     @Test
     public void testGetAllTransactions() {
-        // Given: Masukkan dua transaksi ke repository
         createTransactionEntity("TOP_UP", new BigDecimal("1000"));
         createTransactionEntity("WITHDRAWAL", new BigDecimal("500"));
         
-        // When: Mengambil seluruh transaksi
         List<TransactionEntity> transactions = transactionService.getAllTransactions();
         
-        // Then:
         assertEquals(2, transactions.size());
     }
     
@@ -64,10 +62,8 @@ public class TransactionServiceTest {
     @Test
     public void testDeleteTopUpTransaction() {
         TransactionEntity topUpEntity = createTransactionEntity("TOP_UP", new BigDecimal("1000"));
-        // Ketika delete dipanggil, transaksi bertipe TOP_UP harus dapat dihapus
         transactionService.deleteTopUpTransaction(topUpEntity.getId());
         
-        // Then: Pastikan transaksi tidak ada lagi pada repository
         assertFalse(transactionRepository.findById(topUpEntity.getId()).isPresent());
     }
 }
