@@ -89,18 +89,32 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public void donateWallet(UUID userId, String amountStr) {
-        int donationAmount = Integer.parseInt(amountStr);
+        BigDecimal donationAmountDecimal; 
+        try {
+            donationAmountDecimal = new BigDecimal(amountStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid donation amount format: " + amountStr + ". Must be a valid number.");
+        }
+
+        if (donationAmountDecimal.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Donation amount must be positive.");
+        }
+
         Wallet wallet = getWallet(userId);
-        wallet.setBalance(wallet.getBalance().subtract(new BigDecimal(donationAmount)));
+
+        if (wallet.getBalance().compareTo(donationAmountDecimal) < 0) {
+            throw new IllegalArgumentException("Insufficient balance for donation. Current balance: " + wallet.getBalance() + ", Donation amount: " + donationAmountDecimal);
+        }
+
+        wallet.setBalance(wallet.getBalance().subtract(donationAmountDecimal));
         walletRepository.save(wallet);
 
-        Transaction donation = TransactionFactory.createTransaction("DONATION", new BigDecimal(donationAmount));
+        Transaction donation = TransactionFactory.createTransaction("DONATION", donationAmountDecimal);
         TransactionEntity trxEntity = new TransactionEntity(
                 donation.getType(), donation.getAmount(), donation.getTimestamp(), wallet);
         transactionRepository.save(trxEntity);
 
-        if (observers.isEmpty()) { observers.add(new NotificationService()); }
-        observers.forEach(o -> o.update(wallet));
+        notifyObservers(wallet); 
     }
 
     private void notifyObservers(Wallet wallet) {
