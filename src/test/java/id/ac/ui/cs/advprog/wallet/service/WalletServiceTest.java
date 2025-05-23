@@ -2,13 +2,11 @@ package id.ac.ui.cs.advprog.wallet.service;
 
 import id.ac.ui.cs.advprog.wallet.model.Wallet;
 import id.ac.ui.cs.advprog.wallet.model.transaction.TransactionEntity;
-import id.ac.ui.cs.advprog.wallet.observer.NotificationService;
 import id.ac.ui.cs.advprog.wallet.repository.TransactionRepository;
 import id.ac.ui.cs.advprog.wallet.repository.WalletRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -29,9 +27,6 @@ public class WalletServiceTest {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    @Mock
-    private NotificationService notificationServiceMock;
-
     private WalletService walletService;
     private UUID generatedUuid;
     private UUID testCampaignId;
@@ -39,7 +34,7 @@ public class WalletServiceTest {
 
     @BeforeEach
     void setUp() {
-        walletService = new WalletServiceImpl(walletRepository, transactionRepository, notificationServiceMock);
+        walletService = new WalletServiceImpl(walletRepository, transactionRepository);
         generatedUuid = UUID.randomUUID();
         testCampaignId = UUID.randomUUID();
         testDonationId = UUID.randomUUID();

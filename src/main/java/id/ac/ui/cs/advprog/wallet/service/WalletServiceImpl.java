@@ -7,14 +7,10 @@ import id.ac.ui.cs.advprog.wallet.model.transaction.Transaction;
 import id.ac.ui.cs.advprog.wallet.repository.TransactionRepository;
 import id.ac.ui.cs.advprog.wallet.repository.WalletRepository;
 import id.ac.ui.cs.advprog.wallet.validator.TopUpValidator;
-import id.ac.ui.cs.advprog.wallet.observer.WalletObserver;
-import id.ac.ui.cs.advprog.wallet.observer.NotificationService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,16 +19,12 @@ public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository; 
-    private List<WalletObserver> observers = new ArrayList<>();
     private final TopUpValidator topUpValidator;
 
-    public WalletServiceImpl(WalletRepository walletRepository, TransactionRepository transactionRepository, NotificationService notificationService) {
+    public WalletServiceImpl(WalletRepository walletRepository, TransactionRepository transactionRepository) {
         this.walletRepository = walletRepository;
         this.transactionRepository = transactionRepository;
         this.topUpValidator = new TopUpValidator(transactionRepository);
-        if (notificationService != null) {
-            this.observers.add(notificationService);
-        }
     }
 
     @Override
@@ -68,8 +60,6 @@ public class WalletServiceImpl implements WalletService {
                 topUp.getType(), topUp.getAmount(), topUp.getTimestamp(), currentWallet,
                 null, null); 
         transactionRepository.save(trxEntity);
-
-        notifyObservers(currentWallet);
     }
 
     @Override
@@ -97,8 +87,6 @@ public class WalletServiceImpl implements WalletService {
                 withdrawal.getType(), withdrawal.getAmount(), withdrawal.getTimestamp(), wallet,
                 campaignId, null); 
         transactionRepository.save(trxEntity);
-
-        notifyObservers(wallet);
     }
 
     @Override
@@ -130,13 +118,5 @@ public class WalletServiceImpl implements WalletService {
                 donation.getType(), donation.getAmount(), donation.getTimestamp(), wallet,
                 campaignId, donationId); 
         transactionRepository.save(trxEntity);
-
-        notifyObservers(wallet);
-    }
-
-    private void notifyObservers(Wallet wallet) {
-        for (WalletObserver observer : observers) {
-            observer.update(wallet);
-        }
     }
 }
