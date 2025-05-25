@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +44,7 @@ class TransactionControllerTest {
         assertNotNull(body);
         assertEquals("OK", body.getStatus());
         assertEquals("Success", body.getMessage());
-        assertEquals(((List<?>) body.getData()).size(), 2);
+        assertEquals(2, ((List<?>) body.getData()).size());
     }
 
     @Test

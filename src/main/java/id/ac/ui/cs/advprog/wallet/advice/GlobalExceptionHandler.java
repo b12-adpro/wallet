@@ -2,7 +2,8 @@ package id.ac.ui.cs.advprog.wallet.advice;
 
 import id.ac.ui.cs.advprog.wallet.dto.GeneralResponse;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,11 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Menangani NumberFormatException
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(NumberFormatException.class)
     public ResponseEntity<GeneralResponse> handleNumberFormatException(NumberFormatException ex, WebRequest request) {
+        logger.warn("Invalid number format for request {}: {}", request.getDescription(false), ex.getMessage());
         GeneralResponse responseBody = GeneralResponse.from(
             null,
             "INVALID_FORMAT",
@@ -24,13 +27,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
-    // Menangani IllegalArgumentException umum
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<GeneralResponse> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        logger.warn("Validation error for request {}: {}", request.getDescription(false), ex.getMessage());
         GeneralResponse responseBody = GeneralResponse.from(
-            ex.getMessage(), 
-            "VALIDATION_ERROR", 
-            ex.getMessage() 
+            ex.getMessage(),
+            "VALIDATION_ERROR",
+            ex.getMessage()
         );
         return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
@@ -38,14 +41,12 @@ public class GlobalExceptionHandler {
     // Handler untuk exception umum (catch-all)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GeneralResponse> handleGenericException(Exception ex, WebRequest request) {
-        Logger logger = Logger.getLogger(getClass().getName());
-        logger.info("An unexpected error occurred: " + ex.getMessage());
-        ex.printStackTrace();
+        logger.error("An unexpected error occurred while processing request {}:", request.getDescription(false), ex);
 
         GeneralResponse responseBody = GeneralResponse.from(
             null,
             "INTERNAL_SERVER_ERROR",
-            "An unexpected error occurred. Please try again later."
+            "An unexpected error occurred. Please try again later." // Pesan ramah untuk pengguna
         );
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }
