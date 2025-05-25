@@ -1,0 +1,55 @@
+name: Deploy to Koyeb
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Removed JDK setup and JAR build steps as they are now handled by the Dockerfile's multi-stage build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3 # Use v3 for latest
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_FULL_IMAGE_NAME }} .
+          docker push ${{ secrets.DOCKER_FULL_IMAGE_NAME }}
+
+      - name: Verify Deployment (Optional)
+        # This step is mostly for verification. Koyeb will handle the actual redeploy.
+        # You can add a small delay and then check service status or logs if you have Koyeb CLI configured.
+        # For simplicity, we'll assume Koyeb's auto-deployment works.
+        run: echo "Koyeb service configured for automatic deployment from Docker Hub. New image pushed."
+        
+      - name: Trigger Koyeb Redeploy
+        run: |
+          echo "Triggering Koyeb redeployment for service..."
+          # IMPORTANT:
+          # - Replace YOUR_KOYEB_SERVICE_ID with the actual Service ID from Koyeb.
+          #   This is NOT the Application ID. It's specific to the 'authprofile' service.
+          #   You can find it in the URL when viewing your service (e.g., app.koyeb.com/services/YOUR_KOYEB_SERVICE_ID/overview)
+          #   or via the Koyeb CLI.
+          # - Ensure KOYEB_API_KEY has 'Service' -> 'Update' permissions at least.
+          curl -X POST "https://app.koyeb.com/v1/services/${{ secrets.KOYEB_SERVICE_ID }}/redeploy" \
+            -H "Authorization: Bearer ${{ secrets.KOYEB_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            --data '{}' # Empty data for a simple redeploy
+
+        env:
+          # Ensure these secrets are set in your GitHub repository settings
+          KOYEB_API_KEY: ${{ secrets.KOYEB_API_KEY }}
+          KOYEB_SERVICE_ID: ${{ secrets.KOYEB_SERVICE_ID }}
