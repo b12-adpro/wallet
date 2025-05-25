@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class TransactionFactoryTest {
+class TransactionFactoryTest {
     @Test
     void testCreateTopUpTransaction() {
         Transaction t = TransactionFactory.createTransaction("TOP_UP", new BigDecimal("1000"));
