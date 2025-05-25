@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Import(TransactionServiceImpl.class)
-public class TransactionServiceTest {
+class TransactionServiceTest {
 
     @Autowired
     private TransactionService transactionService;

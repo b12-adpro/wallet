@@ -10,7 +10,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-public class WalletRepositoryTest {
+class WalletRepositoryTest {
 
     @Autowired
     private WalletRepository walletRepository;

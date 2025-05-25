@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ExtendWith(MockitoExtension.class) 
-public class TransactionRepositoryTest {
+class TransactionRepositoryTest {
 
     @Autowired
     private WalletRepository walletRepository;
