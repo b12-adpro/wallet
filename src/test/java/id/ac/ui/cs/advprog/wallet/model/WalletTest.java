@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WalletTest {
     @Test
-    public void testDefaultBalance() {
+    void testDefaultBalance() {
         // Ekspektasi: Instans baru Wallet harus punya saldo 0.
         Wallet wallet = new Wallet();
         assertEquals(BigDecimal.ZERO, wallet.getBalance());

@@ -45,7 +45,7 @@ class TransactionControllerTest {
         assertNotNull(body);
         assertEquals("OK", body.getStatus());
         assertEquals("Success", body.getMessage());
-        assertTrue(((List<?>) body.getData()).size() == 2);
+        assertEquals(((List<?>) body.getData()).size(), 2);
     }
 
     @Test

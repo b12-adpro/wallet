@@ -29,7 +29,7 @@ class TransactionServiceTest {
     }
     
     @Test
-    public void testGetAllTransactions() {
+    void testGetAllTransactions() {
         createTransactionEntity("TOP_UP", new BigDecimal("1000"));
         createTransactionEntity("WITHDRAWAL", new BigDecimal("500"));
         
@@ -39,7 +39,7 @@ class TransactionServiceTest {
     }
     
     @Test
-    public void testGetTransactionsByType() {
+    void testGetTransactionsByType() {
         createTransactionEntity("TOP_UP", new BigDecimal("1000"));
         createTransactionEntity("WITHDRAWAL", new BigDecimal("500"));
         createTransactionEntity("TOP_UP", new BigDecimal("2000"));
@@ -52,7 +52,7 @@ class TransactionServiceTest {
     }
     
     @Test
-    public void testGetTransactionById() {
+    void testGetTransactionById() {
         TransactionEntity entity = createTransactionEntity("DONATION", new BigDecimal("300"));
         TransactionEntity retrieved = transactionService.getTransactionById(entity.getId());
         assertNotNull(retrieved);
@@ -60,7 +60,7 @@ class TransactionServiceTest {
     }
     
     @Test
-    public void testDeleteTopUpTransaction() {
+    void testDeleteTopUpTransaction() {
         TransactionEntity topUpEntity = createTransactionEntity("TOP_UP", new BigDecimal("1000"));
         transactionService.deleteTopUpTransaction(topUpEntity.getId());
         

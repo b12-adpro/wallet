@@ -16,7 +16,7 @@ class WalletRepositoryTest {
     private WalletRepository walletRepository;
     
     @Test
-    public void testSaveAndFindById() {
+    void testSaveAndFindById() {
         Wallet wallet = new Wallet();
         UUID uuid_generated = UUID.randomUUID();
         wallet.setUserId(uuid_generated);

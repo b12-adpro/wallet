@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class) 
-public class TopUpValidatorTest {
+class TopUpValidatorTest {
 
     @Mock 
     private TransactionRepository transactionRepository;

@@ -1,6 +1,9 @@
 package id.ac.ui.cs.advprog.wallet.advice;
 
 import id.ac.ui.cs.advprog.wallet.dto.GeneralResponse;
+
+import java.util.logging.Logger;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,7 +38,8 @@ public class GlobalExceptionHandler {
     // Handler untuk exception umum (catch-all)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GeneralResponse> handleGenericException(Exception ex, WebRequest request) {
-        System.err.println("An unexpected error occurred: " + ex.getMessage());
+        Logger logger = Logger.getLogger(getClass().getName());
+        logger.info("An unexpected error occurred: " + ex.getMessage());
         ex.printStackTrace();
 
         GeneralResponse responseBody = GeneralResponse.from(

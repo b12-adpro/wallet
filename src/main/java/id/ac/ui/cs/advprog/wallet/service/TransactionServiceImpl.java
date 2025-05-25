@@ -43,7 +43,7 @@ public class TransactionServiceImpl implements TransactionService {
     public void deleteTopUpTransaction(UUID id) {
         TransactionEntity transaction = getTransactionById(id);
         if (!"TOP_UP".equalsIgnoreCase(transaction.getType())) {
-            throw new RuntimeException("Not a top-up transaction");
+            throw new IllegalArgumentException("Not a top-up transaction");
         }
         transactionRepository.delete(transaction);
     }
