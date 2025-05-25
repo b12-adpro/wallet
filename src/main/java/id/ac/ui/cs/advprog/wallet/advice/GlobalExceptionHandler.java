@@ -18,18 +18,24 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NumberFormatException.class)
     public ResponseEntity<GeneralResponse> handleNumberFormatException(NumberFormatException ex, WebRequest request) {
-        logger.warn("Invalid number format for request {}: {}", request.getDescription(false), ex.getMessage());
+        if (logger.isWarnEnabled()) { 
+            logger.warn("Invalid number format for request {}: {}", request.getDescription(false), ex.getMessage());
+        }
+
         GeneralResponse responseBody = GeneralResponse.from(
             null,
             "INVALID_FORMAT",
-            "Invalid number format: " + ex.getMessage()
+            "Invalid number format: " + ex.getMessage() 
         );
         return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<GeneralResponse> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
-        logger.warn("Validation error for request {}: {}", request.getDescription(false), ex.getMessage());
+        if (logger.isWarnEnabled()) { 
+            logger.warn("Validation error for request {}: {}", request.getDescription(false), ex.getMessage());
+        }
+
         GeneralResponse responseBody = GeneralResponse.from(
             ex.getMessage(),
             "VALIDATION_ERROR",
@@ -38,15 +44,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
-    // Handler untuk exception umum (catch-all)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GeneralResponse> handleGenericException(Exception ex, WebRequest request) {
-        logger.error("An unexpected error occurred while processing request {}:", request.getDescription(false), ex);
+        if (logger.isErrorEnabled()) {
+             logger.error("An unexpected error occurred while processing request {}:", request.getDescription(false), ex);
+        }
+
 
         GeneralResponse responseBody = GeneralResponse.from(
             null,
             "INTERNAL_SERVER_ERROR",
-            "An unexpected error occurred. Please try again later." // Pesan ramah untuk pengguna
+            "An unexpected error occurred. Please try again later."
         );
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }
