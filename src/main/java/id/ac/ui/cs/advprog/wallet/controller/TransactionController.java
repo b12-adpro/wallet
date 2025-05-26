@@ -12,9 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/transaction")
+@PreAuthorize("hasRole('USER')")
 public class TransactionController {
 
     private final TransactionService transactionService;

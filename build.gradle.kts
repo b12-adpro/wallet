@@ -16,6 +16,9 @@ val jaxbApiVersion = "2.3.1"
 val javassistVersion = "3.25.0-GA"
 val lombokVersion = "1.18.34"
 val h2databaseVersion = "2.2.224"
+val springSecurityTestVersion="6.0.2"
+val springSecurityCryptoVersion="6.0.2"
+val jjwtVersion="0.11.5"
 
 java {
     toolchain {
@@ -50,6 +53,14 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2:$h2databaseVersion")
+
+    testImplementation("org.springframework.security:spring-security-test:$springSecurityTestVersion")
+    implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
+
+    implementation("org.springframework.security:spring-security-crypto:$springSecurityCryptoVersion")
+    implementation("org.springframework.boot:spring-boot-starter-security")
 }
 
 jacoco {
